@@ -1,0 +1,82 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+@theme {
+  --font-thin: "Lato-Thin";
+  --font-extralight: "Lato-Thin";
+  --font-light: "Lato-Light";
+  --font-normal: "Lato-Regular";
+  --font-sans: "Lato-Regular";
+  --font-medium: "Lato-Regular";
+  --font-semibold: "Lato-Bold";
+  --font-bold: "Lato-Bold";
+  --font-extrabold: "Lato-Black";
+  --font-black: "Lato-Black";
+
+  --color-purple-light: #dfdaf2;
+  --color-purple-base: #6a46eb;
+
+  --color-gray-100: #fafafa;
+  --color-gray-200: #f0f0f0;
+  --color-gray-300: #e6e5e5;
+  --color-gray-400: #a1a2a1;
+  --color-gray-500: #676767;
+  --color-gray-600: #4a4a4a;
+  --color-gray-700: #0f0f0f;
+
+  --color-danger-light: #ffd6d6;
+  --color-danger-base: #db4d4d;
+  --color-danger-dark: #9e4949;
+
+  --color-success-light: #bff7be;
+  --color-success-base: #4bb84a;
+  --color-success-dark: #30752f;
+
+  --color-info-light: #ceefff;
+  --color-info-base: #2aa1d9;
+  --color-info-dark: #1d7096;
+}
+
+@media android {
+  :root {
+    --font-thin: "Lato-Thin";
+    --font-extralight: "Lato-Thin";
+    --font-light: "Lato-Light";
+    --font-normal: "Lato-Regular";
+    --font-sans: "Lato-Regular";
+    --font-medium: "Lato-Regular";
+    --font-semibold: "Lato-Bold";
+    --font-bold: "Lato-Bold";
+    --font-extrabold: "Lato-Black";
+    --font-black: "Lato-Black";
+  }
+}
+
+@media ios {
+  :root {
+    --font-thin: "Lato-Thin";
+    --font-extralight: "Lato-Thin";
+    --font-light: "Lato-Light";
+    --font-normal: "Lato-Regular";
+    --font-sans: "Lato-Regular";
+    --font-medium: "Lato-Regular";
+    --font-semibold: "Lato-Bold";
+    --font-bold: "Lato-Bold";
+    --font-extrabold: "Lato-Black";
+    --font-black: "Lato-Black";
+  }
+}
+
+:root,
+html,
+body {
+  height: 100%;
+}
+
+div#root {
+  height: 100%;
+  display: flex;
+}
