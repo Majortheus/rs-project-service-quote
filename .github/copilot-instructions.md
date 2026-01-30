@@ -36,13 +36,12 @@ Project-specific conventions
 
 Files to inspect for patterns/examples
 
-- App shell & routing: [src/app/\_layout.tsx](src/app/_layout.tsx)
-- Example screen: [src/app/(home)/index.tsx](<src/app/(home)/index.tsx>)
-- Bottom sheet hook: [src/hooks/useBottomSheets.tsx](src/hooks/useBottomSheets.tsx)
-- Guards: [src/guards/font-guard.tsx](src/guards/font-guard.tsx)
-- Form components: [src/components/form/input.tsx](src/components/form/input.tsx) and [src/components/form/radio.tsx](src/components/form/radio.tsx)
-
-When changing code
+- App shell & routing: [src/app/\_layout.tsx](../src/app/_layout.tsx)
+- Example screen: [src/app/(home)/index.tsx](<../src/app/(home)/index.tsx>)
+- Bottom sheet hook: [src/hooks/useBottomSheets.tsx](../src/hooks/useBottomSheets.tsx)
+- Guards: [src/guards/font-guard.tsx](../src/guards/font-guard.tsx)
+- Form components: [src/components/form/input.tsx](../src/components/form/input.tsx) and [src/components/form/radio.tsx](../src/components/form/radio.tsx)
+  When changing code
 
 - Keep `GestureHandlerRootView` and `react-native-reanimated` imports in root layout to avoid runtime issues.
 - Preserve `@/` imports and update `tsconfig.json` paths if adding new base aliases.
