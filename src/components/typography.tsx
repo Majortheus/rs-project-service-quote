@@ -6,9 +6,10 @@ type TypographyProps = {
 	children: React.ReactNode
 	className?: string
 	variant?: 'text-xs' | 'text-sm' | 'text-md' | 'title-xs' | 'title-sm' | 'title-md' | 'title-lg'
-}
+	truncate?: boolean
+} & React.ComponentProps<typeof Text>
 
-export function Typography({ children, className, variant = 'text-md' }: TypographyProps) {
+export function Typography({ children, className, variant = 'text-md', truncate = false, ...props }: TypographyProps) {
 	return (
 		<Text
 			className={twMerge(
@@ -22,10 +23,14 @@ export function Typography({ children, className, variant = 'text-md' }: Typogra
 						'font-bold text-sm': variant === 'title-sm',
 						'font-bold text-base': variant === 'title-md',
 						'font-bold text-lg': variant === 'title-lg',
+						truncate: truncate,
 					},
 					className,
 				),
 			)}
+			numberOfLines={truncate ? 1 : undefined}
+			ellipsizeMode={truncate ? 'tail' : undefined}
+			{...props}
 		>
 			{children}
 		</Text>

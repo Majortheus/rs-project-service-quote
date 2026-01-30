@@ -20,7 +20,6 @@ async function saveFiltersToStorage(filters: FilterFormType) {
 async function getFiltersFromStorage(): Promise<FilterFormType> {
 	try {
 		const serializedFilters = await AsyncStorage.getItem(ASYNC_STORAGE_KEY)
-		console.log({ serializedFilters })
 		if (serializedFilters) {
 			return JSON.parse(serializedFilters)
 		}

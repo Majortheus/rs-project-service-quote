@@ -6,15 +6,15 @@ import { Typography } from './typography'
 type ButtonProps = {
 	children?: string
 	startIcon?: React.ComponentType<{ className?: string }>
-	variant?: 'filled' | 'outlined'
+	variant?: 'filled' | 'outlined' | 'ghost'
 	color?: 'primary' | 'danger'
 } & React.ComponentProps<typeof TouchableOpacity>
 
-export function Button({ children, startIcon: StartIcon, variant = 'filled', color = 'primary', ...props }: ButtonProps) {
+export function Button({ children, startIcon: StartIcon, variant = 'filled', color = 'primary', className, ...props }: ButtonProps) {
 	const textColor = clsx({
 		'text-white': variant === 'filled',
-		'text-purple-base': variant === 'outlined' && color === 'primary',
-		'text-danger-base': variant === 'outlined' && color === 'danger',
+		'text-purple-base': (variant === 'outlined' || variant === 'ghost') && color === 'primary',
+		'text-danger-base': (variant === 'outlined' || variant === 'ghost') && color === 'danger',
 	})
 
 	return (
@@ -26,7 +26,9 @@ export function Button({ children, startIcon: StartIcon, variant = 'filled', col
 					'bg-purple-base': variant === 'filled' && color === 'primary',
 					'bg-danger-base': variant === 'filled' && color === 'danger',
 					'border border-gray-300': variant === 'outlined',
+					'p-1': variant === 'ghost',
 				}),
+				className,
 			)}
 			{...props}
 		>

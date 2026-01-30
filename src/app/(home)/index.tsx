@@ -1,4 +1,5 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { FormProvider, useForm } from 'react-hook-form'
 import { FlatList, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { FilterMageIcon } from '@/assets/icons/mage-icons/filter-mage-icons'
@@ -242,13 +243,15 @@ const data: Quote[] = [
 export default function HomeScreen() {
 	const { openBottomSheet } = useBottomSheet()
 
+	const form = useForm()
+
 	return (
 		<Page>
-			<BottomSheetModalProvider>
+			<FormProvider {...form}>
 				<HomeHeader />
 				<View className="flex-1 gap-6 px-5 py-6">
-					<View className="flex-row items-center gap-2">
-						<Input startIcon={SearchMageIcon} placeholder="Título ou cliente" />
+					<View className="w-full flex-row items-center gap-2">
+						<Input name="search" startIcon={SearchMageIcon} placeholder="Título ou cliente" />
 						<Button startIcon={FilterMageIcon} variant="outlined" onPress={() => openBottomSheet(<FilterDrawer />)} />
 					</View>
 					<View className="flex-1">
@@ -261,7 +264,7 @@ export default function HomeScreen() {
 						/>
 					</View>
 				</View>
-			</BottomSheetModalProvider>
+			</FormProvider>
 		</Page>
 	)
 }

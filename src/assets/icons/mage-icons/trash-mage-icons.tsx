@@ -1,6 +1,6 @@
 import { styled } from 'nativewind'
 import { View } from 'react-native'
-import Trash from '@/assets/icons/mage-icons/svgs/trash.svg'
+import Trash from '@/assets/icons/mage-icons/svgs/trash-2.svg'
 
 const StyledTrashMageIcon = styled(Trash)
 
