@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { ScrollView, View } from 'react-native'
 import { EditPenMageIcon } from '@/assets/icons/mage-icons/edit-pen-mage-icons'
@@ -18,7 +18,13 @@ import { useBottomSheet } from '@/hooks/useBottomSheets'
 import { formatMoney } from '@/utils/formatMoney'
 import { AddServiceDrawer } from './add-service-drawer'
 
-const initialItems = [
+const initialItems: {
+	id: string
+	title: string
+	description?: string
+	price: number
+	quantity: number
+}[] = [
 	{
 		id: 'design-interfaces-1',
 		title: 'Design de interfaces',
@@ -41,44 +47,21 @@ export default function CreateQuoteScreen() {
 	const { openBottomSheet } = useBottomSheet()
 
 	const handleAddService = useCallback(() => {
-		openBottomSheet(
-			<AddServiceDrawer
-				onSave={(service) => {
-					if (service.id) {
-						setItems((prev) => prev.map((it) => (it.id === service.id ? { ...it, ...service, price: service.price } : it)))
-					} else {
-						setItems((s) => [{ ...service, id: String(Date.now()) }, ...s])
-					}
-				}}
-				onDelete={(id) => {
-					if (id) setItems((prev) => prev.filter((it) => it.id !== id))
-				}}
-			/>,
-			{ snapPoints: ['55%', '90%'] },
-		)
+		openBottomSheet(<AddServiceDrawer setItems={setItems} />)
 	}, [openBottomSheet])
 
 	const handleEditService = useCallback(
 		(itemId: string) => {
 			const item = items.find((i) => i.id === itemId)
 			if (!item) return
-			openBottomSheet(
-				<AddServiceDrawer
-					initial={item}
-					onSave={(service) => {
-						if (service.id) {
-							setItems((prev) => prev.map((it) => (it.id === service.id ? { ...it, ...service } : it)))
-						}
-					}}
-					onDelete={(id) => {
-						if (id) setItems((prev) => prev.filter((it) => it.id !== id))
-					}}
-				/>,
-				{ snapPoints: ['55%', '90%'] },
-			)
+			openBottomSheet(<AddServiceDrawer initial={item} setItems={setItems} />)
 		},
 		[items, openBottomSheet],
 	)
+
+	useEffect(() => {
+		openBottomSheet(<AddServiceDrawer setItems={setItems} />)
+	}, [openBottomSheet])
 
 	return (
 		<Page>
@@ -89,7 +72,7 @@ export default function CreateQuoteScreen() {
 						Novo Orçamento
 					</Typography>
 				</View>
-				<ScrollView className="p-5">
+				<ScrollView className="flex-1 p-5">
 					<View className="gap-5">
 						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
 							<View className="flex-1 gap-2 p-4">
@@ -132,6 +115,18 @@ export default function CreateQuoteScreen() {
 								<Button startIcon={PlusMageIcon} variant="outlined" onPress={handleAddService}>
 									Adicionar serviço
 								</Button>
+							</View>
+						</FormGroup>
+						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
+							<View className="flex-1 gap-2 p-4">
+								<Input name="title" placeholder="Título" />
+								<Input name="client" placeholder="Cliente" />
+							</View>
+						</FormGroup>
+						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
+							<View className="flex-1 gap-2 p-4">
+								<Input name="title" placeholder="Título" />
+								<Input name="client" placeholder="Cliente" />
 							</View>
 						</FormGroup>
 					</View>

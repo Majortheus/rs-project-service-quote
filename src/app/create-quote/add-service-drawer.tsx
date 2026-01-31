@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { TouchableOpacity, View } from 'react-native'
 import * as z from 'zod'
@@ -11,7 +11,7 @@ import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
 
 const SERVICE_VALIDATION = z.object({
-	id: z.string().optional(),
+	id: z.string(),
 	title: z.string().min(1, 'Título obrigatório'),
 	description: z.string().optional(),
 	price: z.coerce.number().nonnegative(),
@@ -20,60 +20,47 @@ const SERVICE_VALIDATION = z.object({
 
 export type ServiceFormType = z.infer<typeof SERVICE_VALIDATION>
 
-type ServiceFormRaw = {
-	id?: string
-	title: string
-	description?: string
-	price: number
-	quantity: number
-}
-
-export const DEFAULT_SERVICE_VALUES: ServiceFormRaw = {
+export const DEFAULT_SERVICE_VALUES: ServiceFormType = {
+	id: '',
 	title: '',
 	description: '',
 	price: 0,
 	quantity: 1,
 }
 
-export function AddServiceDrawer({
-	initial,
-	onSave,
-	onDelete,
-}: {
-	initial?: Partial<ServiceFormType>
-	onSave: (s: ServiceFormType) => void
-	onDelete?: (id?: string) => void
-}) {
+export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormType; setItems: React.Dispatch<React.SetStateAction<ServiceFormType[]>> }) {
 	const { closeBottomSheet } = useBottomSheet()
 
-	const form = useForm<ServiceFormRaw>({
+	const form = useForm<ServiceFormType>({
 		defaultValues: initial ?? DEFAULT_SERVICE_VALUES,
 	})
 
 	const handleSubmit = useCallback(
-		(data: ServiceFormRaw) => {
-			const parsed = SERVICE_VALIDATION.parse({ ...data })
-			onSave(parsed)
+		(data: ServiceFormType) => {
+			if (data.id) {
+				setItems((services) => services.map((oldService) => (oldService.id === data.id ? { ...oldService, ...data, price: data.price } : oldService)))
+			} else {
+				setItems((services) => [{ ...data, id: String(Date.now()) }, ...services])
+			}
 			closeBottomSheet()
 		},
-		[onSave, closeBottomSheet],
+		[closeBottomSheet, setItems],
 	)
 
 	const handleDelete = useCallback(() => {
 		if (initial?.id) {
-			if (onDelete) onDelete(initial?.id)
+			setItems((services) => services.filter((oldService) => oldService.id !== initial.id))
 		} else {
 			form.reset(DEFAULT_SERVICE_VALUES)
 		}
 		closeBottomSheet()
-	}, [onDelete, initial, closeBottomSheet])
+	}, [initial, closeBottomSheet, form, setItems])
 
 	return (
 		<FormProvider {...form}>
 			<View className="flex-1 items-center bg-white">
 				<View className="w-full max-w-5xl flex-1">
 					<View className="w-full items-center">
-						<View className="my-3 h-1 w-14 rounded-full bg-gray-200" />
 						<View className="w-full flex-row items-center border-gray-200 border-b p-5">
 							<Typography variant="title-sm" className="flex-1">
 								Serviço
@@ -92,13 +79,16 @@ export function AddServiceDrawer({
 								<View className="flex-1">
 									<Input
 										startIcon={() => (
-											<Typography variant="title-md" className="mr-2 self-center">
+											<Typography variant="title-md" className="mr-2 flex w-5">
 												R$
 											</Typography>
 										)}
 										name="price"
 										placeholder="Preço"
 										keyboardType="numeric"
+										container={{
+											className: 'items-baseline',
+										}}
 									/>
 								</View>
 								<View style={{ width: 96 }}>

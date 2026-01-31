@@ -25,7 +25,7 @@ export function Button({ children, startIcon: StartIcon, variant = 'filled', col
 				clsx({
 					'bg-purple-base': variant === 'filled' && color === 'primary',
 					'bg-danger-base': variant === 'filled' && color === 'danger',
-					'border border-gray-300': variant === 'outlined',
+					'border border-gray-300 bg-gray-100': variant === 'outlined',
 					'p-1': variant === 'ghost',
 				}),
 				className,

@@ -5,6 +5,7 @@ import { StatusBar } from 'react-native'
 import 'react-native-reanimated'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { BottomSheetProvider } from '@/hooks/useBottomSheets'
 import { queryClient } from '@/libs/react-query'
 
@@ -15,9 +16,11 @@ export default function RootLayout() {
 		<FontGuard>
 			<GestureHandlerRootView>
 				<QueryClientProvider client={queryClient}>
+					<StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 					<BottomSheetProvider>
-						<StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-						<RootLayoutNav />
+						<KeyboardProvider preload>
+							<RootLayoutNav />
+						</KeyboardProvider>
 					</BottomSheetProvider>
 				</QueryClientProvider>
 			</GestureHandlerRootView>
