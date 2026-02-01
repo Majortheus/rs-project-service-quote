@@ -17,11 +17,11 @@ export default function RootLayout() {
 			<GestureHandlerRootView>
 				<QueryClientProvider client={queryClient}>
 					<StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-					<BottomSheetProvider>
-						<KeyboardProvider preload>
+					<KeyboardProvider preload>
+						<BottomSheetProvider>
 							<RootLayoutNav />
-						</KeyboardProvider>
-					</BottomSheetProvider>
+						</BottomSheetProvider>
+					</KeyboardProvider>
 				</QueryClientProvider>
 			</GestureHandlerRootView>
 		</FontGuard>

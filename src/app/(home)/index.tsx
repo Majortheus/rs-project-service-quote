@@ -251,7 +251,9 @@ export default function HomeScreen() {
 				<HomeHeader />
 				<View className="flex-1 gap-6 px-5 py-6">
 					<View className="w-full flex-row items-center gap-2">
-						<Input name="search" startIcon={SearchMageIcon} placeholder="Título ou cliente" />
+						<View className="flex-1">
+							<Input name="search" startIcon={SearchMageIcon} placeholder="Título ou cliente" />
+						</View>
 						<Button startIcon={FilterMageIcon} variant="outlined" onPress={() => openBottomSheet(<FilterDrawer />)} />
 					</View>
 					<View className="flex-1">

@@ -1,5 +1,6 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetModalProvider, BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { KeyboardScroll } from '@/components/keyboard-aware-scroll'
 
 type BottomSheetContextValue = {
 	openBottomSheet: (content: React.ReactNode, config?: BottomSheetConfig) => void
@@ -62,7 +63,9 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
 					snapPoints={config.snapPoints}
 					onChange={handleSheetChanges}
 				>
-					<BottomSheetScrollView className="min-h-[400] flex-1 bg-background">{content}</BottomSheetScrollView>
+					<BottomSheetScrollView>
+						<KeyboardScroll className="flex-1 bg-white">{content}</KeyboardScroll>
+					</BottomSheetScrollView>
 				</BottomSheet>
 			</BottomSheetContext.Provider>
 		</BottomSheetModalProvider>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { ScrollView, View } from 'react-native'
 import { EditPenMageIcon } from '@/assets/icons/mage-icons/edit-pen-mage-icons'
@@ -10,6 +10,7 @@ import { Button } from '@/components/button'
 import { FormGroup } from '@/components/form/form-group'
 import { Input } from '@/components/form/input'
 import { Radio } from '@/components/form/radio'
+import { KeyboardScroll } from '@/components/keyboard-aware-scroll'
 import { BackButton } from '@/components/page/back-button'
 import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
@@ -59,9 +60,9 @@ export default function CreateQuoteScreen() {
 		[items, openBottomSheet],
 	)
 
-	useEffect(() => {
-		openBottomSheet(<AddServiceDrawer setItems={setItems} />)
-	}, [openBottomSheet])
+	// useEffect(() => {
+	// 	openBottomSheet(<AddServiceDrawer setItems={setItems} />)
+	// }, [openBottomSheet])
 
 	return (
 		<Page>
@@ -72,10 +73,10 @@ export default function CreateQuoteScreen() {
 						Novo Orçamento
 					</Typography>
 				</View>
-				<ScrollView className="flex-1 p-5">
-					<View className="gap-5">
+				<KeyboardScroll>
+					<View className="gap-5 p-5">
 						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
-							<View className="flex-1 gap-2 p-4">
+							<View className="gap-2 p-4">
 								<Input name="title" placeholder="Título" />
 								<Input name="client" placeholder="Cliente" />
 							</View>
@@ -118,19 +119,19 @@ export default function CreateQuoteScreen() {
 							</View>
 						</FormGroup>
 						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
-							<View className="flex-1 gap-2 p-4">
+							<View className="gap-2 p-4">
 								<Input name="title" placeholder="Título" />
 								<Input name="client" placeholder="Cliente" />
 							</View>
 						</FormGroup>
 						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
-							<View className="flex-1 gap-2 p-4">
+							<View className="gap-2 p-4">
 								<Input name="title" placeholder="Título" />
 								<Input name="client" placeholder="Cliente" />
 							</View>
 						</FormGroup>
 					</View>
-				</ScrollView>
+				</KeyboardScroll>
 			</FormProvider>
 		</Page>
 	)
