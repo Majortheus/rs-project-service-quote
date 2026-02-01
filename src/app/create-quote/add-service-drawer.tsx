@@ -7,6 +7,8 @@ import { MultiplyMageIcon } from '@/assets/icons/mage-icons/multiply-mage-icons'
 import { TrashMageIcon } from '@/assets/icons/mage-icons/trash-mage-icons'
 import { Button } from '@/components/button'
 import { Input } from '@/components/form/input'
+import { InputMoney } from '@/components/form/input-money'
+import { TextArea } from '@/components/form/textarea'
 import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
 
@@ -40,7 +42,7 @@ export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormT
 			if (data.id) {
 				setItems((services) => services.map((oldService) => (oldService.id === data.id ? { ...oldService, ...data, price: data.price } : oldService)))
 			} else {
-				setItems((services) => [{ ...data, id: String(Date.now()) }, ...services])
+				setItems((services) => [...services, { ...data, id: String(Date.now()) }])
 			}
 			closeBottomSheet()
 		},
@@ -74,22 +76,10 @@ export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormT
 					<View className="flex-1 gap-5 border-gray-200 border-b p-5 pb-8">
 						<View className="gap-3">
 							<Input name="title" placeholder="Título do serviço" />
-							<Input name="description" placeholder="Descrição (opcional)" />
+							<TextArea name="description" placeholder="Descrição (opcional)" />
 							<View className="flex-row gap-3">
 								<View className="flex-1">
-									<Input
-										startIcon={() => (
-											<Typography variant="title-md" className="mr-2 flex w-5">
-												R$
-											</Typography>
-										)}
-										name="price"
-										placeholder="Preço"
-										keyboardType="numeric"
-										container={{
-											className: 'items-baseline',
-										}}
-									/>
+									<InputMoney name="price" placeholder="Preço" />
 								</View>
 								<View style={{ width: 96 }}>
 									<Input name="quantity" placeholder="Qt" keyboardType="numeric" />

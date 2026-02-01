@@ -6,7 +6,7 @@ import 'react-native-reanimated'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
-import { BottomSheetProvider } from '@/hooks/useBottomSheets'
+import { BottomSheetProvider, useBottomSheet } from '@/hooks/useBottomSheets'
 import { queryClient } from '@/libs/react-query'
 
 export { ErrorBoundary } from 'expo-router'
@@ -14,7 +14,7 @@ export { ErrorBoundary } from 'expo-router'
 export default function RootLayout() {
 	return (
 		<FontGuard>
-			<GestureHandlerRootView>
+			<GestureHandlerRootView style={{ flex: 1 }}>
 				<QueryClientProvider client={queryClient}>
 					<StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 					<KeyboardProvider preload>
@@ -29,8 +29,9 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+	const { isBottomSheetOpen } = useBottomSheet()
 	return (
-		<Stack screenOptions={{ headerShown: false }}>
+		<Stack screenOptions={{ headerShown: false, contentStyle: { overflow: isBottomSheetOpen ? 'hidden' : 'visible' } }}>
 			<Stack.Screen name="(home)/index" />
 			<Stack.Screen name="create-quote/index" />
 			<Stack.Screen name="quote-details/index" />

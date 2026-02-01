@@ -7,10 +7,6 @@ import { twMerge } from 'tailwind-merge'
 type InputProps = {
 	name: string
 	startIcon?: React.FunctionComponent<{ className?: string; width?: number; height?: number }>
-
-	container?: {
-		className?: string
-	}
 } & React.ComponentProps<typeof TextInput>
 
 export function Input({ name, startIcon: StartIcon, className, ...props }: InputProps) {
@@ -24,11 +20,10 @@ export function Input({ name, startIcon: StartIcon, className, ...props }: Input
 			render={({ field: { onChange, value }, fieldState: { error } }) => {
 				return (
 					<Pressable
-						accessible={false}
+						tabIndex={-1}
 						onPress={() => inputRef.current?.focus()}
 						className={twMerge(
 							'group h-12 w-full flex-row items-center justify-center rounded-full border border-gray-300 bg-gray-100 px-4 focus-within:border-purple-base focus:border-purple-base',
-							props.container?.className,
 							clsx({
 								'border-danger-base focus-within:border-danger-base focus:border-danger-base': error,
 							}),

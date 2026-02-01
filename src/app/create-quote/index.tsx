@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { ScrollView, View } from 'react-native'
 import { EditPenMageIcon } from '@/assets/icons/mage-icons/edit-pen-mage-icons'
@@ -60,9 +60,9 @@ export default function CreateQuoteScreen() {
 		[items, openBottomSheet],
 	)
 
-	// useEffect(() => {
-	// 	openBottomSheet(<AddServiceDrawer setItems={setItems} />)
-	// }, [openBottomSheet])
+	useEffect(() => {
+		openBottomSheet(<AddServiceDrawer setItems={setItems} />)
+	}, [openBottomSheet])
 
 	return (
 		<Page>
@@ -116,18 +116,6 @@ export default function CreateQuoteScreen() {
 								<Button startIcon={PlusMageIcon} variant="outlined" onPress={handleAddService}>
 									Adicionar serviço
 								</Button>
-							</View>
-						</FormGroup>
-						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
-							<View className="gap-2 p-4">
-								<Input name="title" placeholder="Título" />
-								<Input name="client" placeholder="Cliente" />
-							</View>
-						</FormGroup>
-						<FormGroup title="Informações gerais" icon={ShopMageIcon}>
-							<View className="gap-2 p-4">
-								<Input name="title" placeholder="Título" />
-								<Input name="client" placeholder="Cliente" />
 							</View>
 						</FormGroup>
 					</View>
