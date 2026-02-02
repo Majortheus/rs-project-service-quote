@@ -61,8 +61,8 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
 					snapPoints={config.snapPoints}
 					onClose={closeBottomSheet}
 				>
-					<BottomSheetView>
-						<KeyboardScroll className="flex-1 bg-white">{content}</KeyboardScroll>
+					<BottomSheetView className="pb-20">
+						<KeyboardScroll>{content}</KeyboardScroll>
 					</BottomSheetView>
 				</BottomSheet>
 			</BottomSheetContext.Provider>

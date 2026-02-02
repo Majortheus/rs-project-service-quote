@@ -8,11 +8,12 @@ import { TrashMageIcon } from '@/assets/icons/mage-icons/trash-mage-icons'
 import { Button } from '@/components/button'
 import { Input } from '@/components/form/input'
 import { InputMoney } from '@/components/form/input-money'
+import { Quantity } from '@/components/form/quantity'
 import { TextArea } from '@/components/form/textarea'
 import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
 
-const SERVICE_VALIDATION = z.object({
+export const SERVICE_VALIDATION = z.object({
 	id: z.string(),
 	title: z.string().min(1, 'Título obrigatório'),
 	description: z.string().optional(),
@@ -30,7 +31,13 @@ export const DEFAULT_SERVICE_VALUES: ServiceFormType = {
 	quantity: 1,
 }
 
-export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormType; setItems: React.Dispatch<React.SetStateAction<ServiceFormType[]>> }) {
+type AddServiceDrawerProps = {
+	initial?: ServiceFormType
+	onSuccess: (data: ServiceFormType) => void
+	onDelete?: () => void
+}
+
+export function AddServiceDrawer({ initial, onSuccess, onDelete }: AddServiceDrawerProps) {
 	const { closeBottomSheet } = useBottomSheet()
 
 	const form = useForm<ServiceFormType>({
@@ -39,24 +46,20 @@ export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormT
 
 	const handleSubmit = useCallback(
 		(data: ServiceFormType) => {
-			if (data.id) {
-				setItems((services) => services.map((oldService) => (oldService.id === data.id ? { ...oldService, ...data, price: data.price } : oldService)))
-			} else {
-				setItems((services) => [...services, { ...data, id: String(Date.now()) }])
-			}
+			onSuccess(data)
 			closeBottomSheet()
 		},
-		[closeBottomSheet, setItems],
+		[closeBottomSheet, onSuccess],
 	)
 
 	const handleDelete = useCallback(() => {
 		if (initial?.id) {
-			setItems((services) => services.filter((oldService) => oldService.id !== initial.id))
+			onDelete?.()
 		} else {
 			form.reset(DEFAULT_SERVICE_VALUES)
 		}
 		closeBottomSheet()
-	}, [initial, closeBottomSheet, form, setItems])
+	}, [initial, closeBottomSheet, form, onDelete])
 
 	return (
 		<FormProvider {...form}>
@@ -81,8 +84,8 @@ export function AddServiceDrawer({ initial, setItems }: { initial?: ServiceFormT
 								<View className="flex-1">
 									<InputMoney name="price" placeholder="Preço" />
 								</View>
-								<View style={{ width: 96 }}>
-									<Input name="quantity" placeholder="Qt" keyboardType="numeric" />
+								<View className="w-[112px]">
+									<Quantity name="quantity" placeholder="Qt" />
 								</View>
 							</View>
 						</View>
