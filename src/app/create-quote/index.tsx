@@ -4,6 +4,7 @@ import z from 'zod'
 import { CreditCardMageIcon } from '@/assets/icons/mage-icons/credit-card-mage-icons'
 import { ShopMageIcon } from '@/assets/icons/mage-icons/shop-mage-icons'
 import { TagMageIcon } from '@/assets/icons/mage-icons/tag-mage-icons'
+import { SERVICE_VALIDATION } from '@/components/app/create-quote/add-service-drawer'
 import { QuoteService } from '@/components/app/create-quote/quote-service'
 import { FormGroup } from '@/components/form/form-group'
 import { Input } from '@/components/form/input'
@@ -13,7 +14,6 @@ import { BackButton } from '@/components/page/back-button'
 import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
-import { SERVICE_VALIDATION } from '../../components/app/create-quote/add-service-drawer'
 
 const CREATE_QUOTE_VALIDATION = z.object({
 	id: z.string(),
