@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { TouchableOpacity, View } from 'react-native'
@@ -6,22 +7,22 @@ import { CheckMageIcon } from '@/assets/icons/mage-icons/check-mage-icons'
 import { MultiplyMageIcon } from '@/assets/icons/mage-icons/multiply-mage-icons'
 import { TrashMageIcon } from '@/assets/icons/mage-icons/trash-mage-icons'
 import { Button } from '@/components/button'
-import { Input } from '@/components/form/input'
-import { InputMoney } from '@/components/form/input-money'
+import { Input } from '@/components/form/inputs/input'
+import { InputMoney } from '@/components/form/inputs/input-money'
 import { Quantity } from '@/components/form/quantity'
 import { TextArea } from '@/components/form/textarea'
 import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
 
-export const SERVICE_VALIDATION = z.object({
+export const SERVICE_SCHEMA = z.object({
 	id: z.string(),
 	title: z.string().min(1, 'Título obrigatório'),
 	description: z.string().optional(),
-	price: z.coerce.number().nonnegative(),
-	quantity: z.coerce.number().int().min(1),
+	price: z.coerce.number().nonnegative().min(0.01, 'Preço deve ser maior que zero') as z.ZodNumber,
+	quantity: z.coerce.number().int().min(1) as z.ZodNumber,
 })
 
-export type ServiceFormType = z.infer<typeof SERVICE_VALIDATION>
+export type ServiceFormType = z.infer<typeof SERVICE_SCHEMA>
 
 export const DEFAULT_SERVICE_VALUES: ServiceFormType = {
 	id: '',
@@ -42,14 +43,15 @@ export function AddServiceDrawer({ initial, onSuccess, onDelete }: AddServiceDra
 
 	const form = useForm<ServiceFormType>({
 		defaultValues: initial ?? DEFAULT_SERVICE_VALUES,
+		resolver: zodResolver(SERVICE_SCHEMA),
 	})
 
 	const handleSubmit = useCallback(
 		(data: ServiceFormType) => {
-			onSuccess(data)
+			onSuccess({ ...data, id: initial?.id ?? String(Date.now()) })
 			closeBottomSheet()
 		},
-		[closeBottomSheet, onSuccess],
+		[closeBottomSheet, onSuccess, initial],
 	)
 
 	const handleDelete = useCallback(() => {

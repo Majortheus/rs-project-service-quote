@@ -1,13 +1,17 @@
-import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
-import { TextInput, View } from 'react-native'
+import { useCallback } from 'react'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { View } from 'react-native'
 import z from 'zod'
+import { CheckMageIcon } from '@/assets/icons/mage-icons/check-mage-icons'
 import { CreditCardMageIcon } from '@/assets/icons/mage-icons/credit-card-mage-icons'
 import { ShopMageIcon } from '@/assets/icons/mage-icons/shop-mage-icons'
 import { TagMageIcon } from '@/assets/icons/mage-icons/tag-mage-icons'
-import { SERVICE_VALIDATION } from '@/components/app/create-quote/add-service-drawer'
+import { SERVICE_SCHEMA } from '@/components/app/create-quote/add-service-drawer'
 import { QuoteService } from '@/components/app/create-quote/quote-service'
+import { Button } from '@/components/button'
 import { FormGroup } from '@/components/form/form-group'
-import { Input } from '@/components/form/input'
+import { Input } from '@/components/form/inputs/input'
+import { InputPercentage } from '@/components/form/inputs/input-percentage'
 import { Radio } from '@/components/form/radio'
 import { KeyboardScroll } from '@/components/keyboard-aware-scroll'
 import { BackButton } from '@/components/page/back-button'
@@ -21,7 +25,7 @@ const CREATE_QUOTE_VALIDATION = z.object({
 	title: z.string().min(1, 'Título obrigatório'),
 	client: z.string().min(1, 'Cliente obrigatório'),
 	status: z.enum(['draft', 'sent', 'approved', 'rejected']),
-	services: z.array(SERVICE_VALIDATION),
+	services: z.array(SERVICE_SCHEMA),
 	discount: z.number().min(0).max(100).default(0),
 })
 
@@ -41,6 +45,10 @@ export default function CreateQuoteScreen() {
 		defaultValues: DEFAULT_CREATE_QUOTE_VALUES,
 	})
 
+	const onSubmit = useCallback((data: CreateQuoteFormType) => {
+		console.log('Submitting quote:', data)
+	}, [])
+
 	return (
 		<Page>
 			<FormProvider {...form}>
@@ -56,6 +64,14 @@ export default function CreateQuoteScreen() {
 						<StatusGroup />
 						<QuoteService />
 						<Pricing />
+					</View>
+					<View className="sticky bottom-0 flex-1 flex-row justify-center gap-3 border-gray-200 border-t p-5 pb-20">
+						<Button className="w-[95px]" variant="outlined">
+							Cancelar
+						</Button>
+						<Button className="w-[102px]" startIcon={CheckMageIcon} onPress={form.handleSubmit(onSubmit)}>
+							Salvar
+						</Button>
 					</View>
 				</KeyboardScroll>
 			</FormProvider>
@@ -100,7 +116,7 @@ function StatusGroup() {
 }
 
 function Pricing() {
-	const { watch, control } = useFormContext<CreateQuoteFormType>()
+	const { watch } = useFormContext<CreateQuoteFormType>()
 	const services = watch('services') ?? []
 	const discount = watch('discount') ?? 0
 
@@ -111,85 +127,56 @@ function Pricing() {
 
 	const itemCount = services.reduce((sum, s) => sum + (s.quantity ? Number(s.quantity) : 1), 0)
 
-	const percent = Math.min(Math.max(0, discount), 100)
-	const discountAmount = Math.round(((subtotal * percent) / 100) * 100) / 100
+	const discountAmount = Math.round(((subtotal * discount) / 100) * 100) / 100
 	const total = Math.round(Math.max(0, subtotal - discountAmount) * 100) / 100
 
 	return (
 		<FormGroup title="Investimento" icon={CreditCardMageIcon}>
-			<View className="gap-2 p-4">
+			<View className="gap-3 p-4 pl-5">
 				<View className="flex-row items-center justify-between">
-					<Typography variant="text-sm" className="text-gray-500">
-						Subtotal
-					</Typography>
+					<Typography variant="text-sm">Subtotal</Typography>
 
 					<View className="flex-row items-center gap-3">
-						<Typography variant="text-sm" className="text-gray-500">
+						<Typography variant="text-xs" className="text-gray-600">
 							{itemCount} itens
 						</Typography>
 
 						<View className="flex-row items-baseline gap-1">
 							<Typography variant="text-xs">R$</Typography>
-							<Typography variant="title-md">{formatMoney(subtotal)}</Typography>
+							<Typography variant="title-sm">{formatMoney(subtotal)}</Typography>
 						</View>
 					</View>
 				</View>
 
 				<View className="flex-row items-center justify-between">
-					<Typography variant="text-sm" className="text-gray-500">
-						Desconto
-					</Typography>
+					<View className="flex-1 flex-row items-center gap-2">
+						<Typography variant="text-sm">Desconto</Typography>
 
-					<View className="flex-row items-center gap-3">
-						<Controller
-							control={control}
-							name="discount"
-							render={({ field: { onChange, value } }) => {
-								const display = value !== undefined ? String(value) : ''
-								return (
-									<View className="h-12 flex-row items-center rounded-full border border-gray-300 bg-gray-100 px-3">
-										<TextInput
-											className="flex-1 text-base text-gray-700"
-											style={{ textAlign: 'right' }}
-											keyboardType="numeric"
-											placeholder="0"
-											onChange={(e) => {
-												const raw = e.nativeEvent.text.replace(/,/g, '.')
-												const num = Number(raw.replace(/[^0-9.]/g, ''))
-												onChange(Number.isNaN(num) ? 0 : num)
-											}}
-											value={display}
-										/>
-										<View className="pr-1 pl-2">
-											<Typography variant="text-sm" className="text-gray-500">
-												%
-											</Typography>
-										</View>
-									</View>
-								)
-							}}
-						/>
-
-						<View>
-							<Typography variant="text-sm" className="text-danger-base">
-								- R$ {formatMoney(discountAmount)}
-							</Typography>
+						<View className="flex-1">
+							<InputPercentage name="discount" />
 						</View>
 					</View>
+					<View className="flex-1 flex-row items-baseline justify-end gap-1">
+						<Typography variant="text-xs" className="text-danger-base">
+							- R$
+						</Typography>
+						<Typography variant="text-sm" className="text-danger-base">
+							{formatMoney(discountAmount)}
+						</Typography>
+					</View>
 				</View>
-
-				<View className="flex-row items-center justify-between border-gray-100 border-t pt-3">
-					<Typography variant="title-sm">Valor total</Typography>
-					<View className="items-end">
-						<Typography variant="text-sm" className="text-gray-500 line-through">
+			</View>
+			<View className="flex-row items-center justify-between border-gray-200 border-t bg-gray-100 px-5 py-4">
+				<Typography variant="title-sm">Valor total</Typography>
+				<View className="items-end">
+					{discount > 0 && (
+						<Typography variant="text-xs" className="text-gray-600 line-through">
 							R$ {formatMoney(subtotal)}
 						</Typography>
-						<View className="flex-row items-baseline gap-1">
-							<Typography variant="text-xs">R$</Typography>
-							<Typography variant="title-md" className="text-purple-base">
-								{formatMoney(total)}
-							</Typography>
-						</View>
+					)}
+					<View className="flex-row items-baseline gap-1">
+						<Typography variant="text-xs">R$</Typography>
+						<Typography variant="title-lg">{formatMoney(total)}</Typography>
 					</View>
 				</View>
 			</View>
