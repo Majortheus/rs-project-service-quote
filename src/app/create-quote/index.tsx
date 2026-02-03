@@ -1,3 +1,5 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'expo-router'
 import { useCallback } from 'react'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { View } from 'react-native'
@@ -20,16 +22,16 @@ import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
 import { formatMoney } from '@/utils/formatMoney'
 
-const CREATE_QUOTE_VALIDATION = z.object({
+const CREATE_QUOTE_SCHEMA = z.object({
 	id: z.string(),
 	title: z.string().min(1, 'Título obrigatório'),
 	client: z.string().min(1, 'Cliente obrigatório'),
 	status: z.enum(['draft', 'sent', 'approved', 'rejected']),
-	services: z.array(SERVICE_SCHEMA),
-	discount: z.number().min(0).max(100).default(0),
+	services: z.array(SERVICE_SCHEMA).min(1, 'Adicione ao menos um serviço'),
+	discount: z.number().min(0).max(100),
 })
 
-export type CreateQuoteFormType = z.infer<typeof CREATE_QUOTE_VALIDATION>
+export type CreateQuoteFormType = z.infer<typeof CREATE_QUOTE_SCHEMA>
 
 export const DEFAULT_CREATE_QUOTE_VALUES: CreateQuoteFormType = {
 	id: '',
@@ -41,8 +43,11 @@ export const DEFAULT_CREATE_QUOTE_VALUES: CreateQuoteFormType = {
 }
 
 export default function CreateQuoteScreen() {
+	const router = useRouter()
+
 	const form = useForm<CreateQuoteFormType>({
 		defaultValues: DEFAULT_CREATE_QUOTE_VALUES,
+		resolver: zodResolver(CREATE_QUOTE_SCHEMA),
 	})
 
 	const onSubmit = useCallback((data: CreateQuoteFormType) => {
@@ -66,7 +71,14 @@ export default function CreateQuoteScreen() {
 						<Pricing />
 					</View>
 					<View className="sticky bottom-0 flex-1 flex-row justify-center gap-3 border-gray-200 border-t p-5 pb-20">
-						<Button className="w-[95px]" variant="outlined">
+						<Button
+							className="w-[95px]"
+							variant="outlined"
+							onPress={() => {
+								form.reset()
+								router.back()
+							}}
+						>
 							Cancelar
 						</Button>
 						<Button className="w-[102px]" startIcon={CheckMageIcon} onPress={form.handleSubmit(onSubmit)}>

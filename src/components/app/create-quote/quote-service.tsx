@@ -15,7 +15,8 @@ import { AddServiceDrawer } from './add-service-drawer'
 export function QuoteService() {
 	const { openBottomSheet } = useBottomSheet()
 
-	const { control } = useFormContext<CreateQuoteFormType>()
+	const { control, getFieldState } = useFormContext<CreateQuoteFormType>()
+	const { error } = getFieldState('services')
 	const servicesArray = useFieldArray({ name: 'services', control: control })
 
 	const handleAddService = useCallback(() => {
@@ -51,6 +52,11 @@ export function QuoteService() {
 				<Button startIcon={PlusMageIcon} variant="outlined" onPress={handleAddService}>
 					Adicionar serviço
 				</Button>
+				{error && (
+					<Typography variant="text-sm" className="text-red-500">
+						{error.message}
+					</Typography>
+				)}
 			</View>
 		</FormGroup>
 	)
