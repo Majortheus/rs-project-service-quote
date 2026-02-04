@@ -19,7 +19,7 @@ export const SERVICE_SCHEMA = z.object({
 	title: z.string().min(1, 'Título obrigatório'),
 	description: z.string().optional(),
 	price: z.coerce.number().nonnegative().min(0.01, 'Preço deve ser maior que zero') as z.ZodNumber,
-	quantity: z.coerce.number().int().min(1) as z.ZodNumber,
+	qty: z.coerce.number().int().min(1) as z.ZodNumber,
 })
 
 export type ServiceFormType = z.infer<typeof SERVICE_SCHEMA>
@@ -29,7 +29,7 @@ export const DEFAULT_SERVICE_VALUES: ServiceFormType = {
 	title: '',
 	description: '',
 	price: 0,
-	quantity: 1,
+	qty: 1,
 }
 
 type AddServiceDrawerProps = {
@@ -87,7 +87,7 @@ export function AddServiceDrawer({ initial, onSuccess, onDelete }: AddServiceDra
 									<InputMoney name="price" placeholder="Preço" />
 								</View>
 								<View className="w-[112px]">
-									<Quantity name="quantity" placeholder="Qt" />
+									<Quantity name="qty" placeholder="Qt" />
 								</View>
 							</View>
 						</View>

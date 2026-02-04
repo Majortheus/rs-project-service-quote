@@ -8,241 +8,19 @@ import { HomeHeader } from '@/components/app/home/home-header'
 import { Button } from '@/components/button'
 import { Input } from '@/components/form/inputs/input'
 import { Page } from '@/components/page/page'
-import { Status, type StatusType } from '@/components/status'
+import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
+import { useGetQuotes } from '@/services/queries/quotes-query'
+import type { Quote } from '@/services/quote'
 import { formatMoney } from '@/utils/formatMoney'
-
-type Quote = {
-	id: number
-	client: string
-	title: string
-	items: Array<{
-		description: string
-		qty: number
-		price: number
-	}>
-	discountPct: number
-	status: StatusType
-	createdAt: string
-	updatedAt: string
-}
-
-const data: Quote[] = [
-	{
-		id: 1,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 1',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 2,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 2',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 3,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 3',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 4,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 4',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 5,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 5',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 6,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 6',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 7,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 7',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 8,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 8',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 9,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 9',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 10,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 10',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 11,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 11',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 12,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 12',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: 13,
-		client: 'Nome do cliente',
-		title: 'Título do serviço 13',
-		items: [
-			{
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-]
 
 export default function HomeScreen() {
 	const { openBottomSheet } = useBottomSheet()
 
 	const form = useForm()
+
+	const { data: quotes = [] } = useGetQuotes()
 
 	return (
 		<Page>
@@ -257,7 +35,7 @@ export default function HomeScreen() {
 					</View>
 					<View className="flex-1">
 						<FlatList
-							data={data}
+							data={quotes}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={({ item }) => <QuoteItem quote={item} />}
 							showsVerticalScrollIndicator={false}

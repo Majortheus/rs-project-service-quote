@@ -28,8 +28,8 @@ const CREATE_QUOTE_SCHEMA = z.object({
 	title: z.string().min(1, 'Título obrigatório'),
 	client: z.string().min(1, 'Cliente obrigatório'),
 	status: z.enum(['draft', 'sent', 'approved', 'rejected']),
-	services: z.array(SERVICE_SCHEMA).min(1, 'Adicione ao menos um serviço'),
-	discount: z.number().min(0).max(100),
+	items: z.array(SERVICE_SCHEMA).min(1, 'Adicione ao menos um serviço'),
+	discountPct: z.number().min(0).max(100),
 })
 
 export type QuoteFormType = z.infer<typeof CREATE_QUOTE_SCHEMA>
@@ -39,8 +39,8 @@ export const DEFAULT_CREATE_QUOTE_VALUES: QuoteFormType = {
 	title: '',
 	client: '',
 	status: 'draft',
-	services: [],
-	discount: 0,
+	items: [],
+	discountPct: 0,
 }
 
 export default function CreateQuoteScreen() {
@@ -132,17 +132,16 @@ function StatusGroup() {
 
 function Pricing() {
 	const { watch } = useFormContext<QuoteFormType>()
-	const services = watch('services') ?? []
-	const discount = watch('discount') ?? 0
+	const items = watch('items') ?? []
+	const discountPct = watch('discountPct') ?? 0
 
-	const subtotal = services.reduce((sum, s) => {
-		const qty = s.quantity ? Number(s.quantity) : 1
+	const subtotal = items.reduce((sum, s) => {
+		const qty = s.qty ? Number(s.qty) : 1
 		return sum + (s.price ?? 0) * (qty || 1)
 	}, 0)
 
-	const itemCount = services.reduce((sum, s) => sum + (s.quantity ? Number(s.quantity) : 1), 0)
-
-	const discountAmount = Math.round(((subtotal * discount) / 100) * 100) / 100
+	const itemCount = items.reduce((sum, s) => sum + (s.qty ? Number(s.qty) : 1), 0)
+	const discountAmount = Math.round(((subtotal * discountPct) / 100) * 100) / 100
 	const total = Math.round(Math.max(0, subtotal - discountAmount) * 100) / 100
 
 	return (
@@ -168,7 +167,7 @@ function Pricing() {
 						<Typography variant="text-sm">Desconto</Typography>
 
 						<View className="flex-1">
-							<InputPercentage name="discount" />
+							<InputPercentage name="discountPct" />
 						</View>
 					</View>
 					<View className="flex-1 flex-row items-baseline justify-end gap-1">
@@ -184,7 +183,7 @@ function Pricing() {
 			<View className="flex-row items-center justify-between border-gray-200 border-t bg-gray-100 px-5 py-4">
 				<Typography variant="title-sm">Valor total</Typography>
 				<View className="items-end">
-					{discount > 0 && (
+					{discountPct > 0 && (
 						<Typography variant="text-xs" className="text-gray-600 line-through">
 							R$ {formatMoney(subtotal)}
 						</Typography>

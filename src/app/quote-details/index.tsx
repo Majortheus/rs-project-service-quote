@@ -17,26 +17,28 @@ import { BackButton } from '@/components/page/back-button'
 import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
+import type { Quote } from '@/services/quote'
 import { formatMoney } from '@/utils/formatMoney'
-import type { QuoteFormType } from '../create-quote'
 
-const MOCK_QUOTE: QuoteFormType = {
+const MOCK_QUOTE: Quote = {
 	id: '1',
 	client: 'Cliente Exemplo',
 	title: 'Instalação elétrica - residência',
-	services: [
-		{ id: '1', title: 'Pontos de luz', description: 'Instalação de pontos de luz', quantity: 2, price: 250 },
-		{ id: '2', title: 'Quadro de disjuntores', description: 'Troca do quadro de disjuntores', quantity: 1, price: 500 },
+	items: [
+		{ id: '1', title: 'Pontos de luz', description: 'Instalação de pontos de luz', qty: 2, price: 250 },
+		{ id: '2', title: 'Quadro de disjuntores', description: 'Troca do quadro de disjuntores', qty: 1, price: 500 },
 	],
-	discount: 10,
+	discountPct: 10,
 	status: 'sent',
+	createdAt: '2024-08-22T10:00:00',
+	updatedAt: '2024-08-25T15:30:00',
 }
 
 export default function QuoteDetailsScreen() {
 	const quote = MOCK_QUOTE
 
-	const subtotal = quote.services.reduce((sum, it) => sum + it.price * it.quantity, 0)
-	const discountAmount = Math.round(((subtotal * quote.discount) / 100) * 100) / 100
+	const subtotal = quote.items.reduce((sum, it) => sum + it.price * it.qty, 0)
+	const discountAmount = Math.round(((subtotal * quote.discountPct) / 100) * 100) / 100
 	const total = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100)
 
 	return (
@@ -92,7 +94,7 @@ export default function QuoteDetailsScreen() {
 					<FormGroup title="Serviços inclusos" icon={NoteWithTextMageIcon}>
 						<View className="p-5 pt-4">
 							<FlatList
-								data={quote.services}
+								data={quote.items}
 								keyExtractor={(_, i) => i.toString()}
 								renderItem={({ item }) => (
 									<View className="flex-row items-start justify-between gap-4">
@@ -113,7 +115,7 @@ export default function QuoteDetailsScreen() {
 												<Typography variant="title-md">{formatMoney(item.price)}</Typography>
 											</View>
 											<Typography variant="text-xs" className="text-gray-600">
-												Qt: {item.quantity}
+												Qt: {item.qty}
 											</Typography>
 										</View>
 									</View>
@@ -134,19 +136,19 @@ export default function QuoteDetailsScreen() {
 									<Typography variant="text-sm" className="text-gray-600">
 										Subtotal
 									</Typography>
-									<Typography variant="title-sm" className={twMerge('text-gray-600', clsx({ 'line-through': quote.discount > 0 }))}>
+									<Typography variant="title-sm" className={twMerge('text-gray-600', clsx({ 'line-through': quote.discountPct > 0 }))}>
 										R$ {formatMoney(subtotal)}
 									</Typography>
 								</View>
 
-								{quote.discount > 0 && (
+								{quote.discountPct > 0 && (
 									<View className="flex-row items-center justify-between">
 										<View className="flex-row items-center gap-3">
 											<Typography variant="text-sm" className="text-gray-600">
 												Desconto
 											</Typography>
 											<Typography variant="title-xs" className="rounded bg-success-light px-1.5 py-0.5 text-success-dark">
-												{quote.discount}% off
+												{quote.discountPct}% off
 											</Typography>
 										</View>
 										<Typography variant="title-sm" className={'text-success-dark'}>

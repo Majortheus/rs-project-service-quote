@@ -16,8 +16,8 @@ export function QuoteService() {
 	const { openBottomSheet } = useBottomSheet()
 
 	const { control, getFieldState } = useFormContext<QuoteFormType>()
-	const { error } = getFieldState('services')
-	const servicesArray = useFieldArray({ name: 'services', control: control })
+	const { error } = getFieldState('items')
+	const servicesArray = useFieldArray({ name: 'items', control: control })
 
 	const handleAddService = useCallback(() => {
 		openBottomSheet(<AddServiceDrawer onSuccess={(data) => servicesArray.append(data)} />)
@@ -45,7 +45,7 @@ export function QuoteService() {
 						title={service.title}
 						description={service.description}
 						price={service.price}
-						quantity={service.quantity}
+						quantity={service.qty}
 						onEdit={() => handleEditService(index)}
 					/>
 				))}
