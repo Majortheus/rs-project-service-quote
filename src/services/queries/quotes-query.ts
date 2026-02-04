@@ -13,6 +13,17 @@ export function useGetQuotes() {
 	})
 }
 
+export function useGetQuote(id?: string) {
+	return useQuery({
+		queryKey: [...QUERY_KEY, id],
+		queryFn: async () => {
+			if (!id) return null
+			return quotesService.getQuoteById(String(id))
+		},
+		enabled: !!id,
+	})
+}
+
 export function useMutateQuotes() {
 	const queryClient = useQueryClient()
 
@@ -21,8 +32,16 @@ export function useMutateQuotes() {
 			const next = await quotesService.addQuote(quote)
 			return next
 		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(QUERY_KEY, () => data)
+		onMutate: async (newQuote: Quote) => {
+			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
+			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => [...old, newQuote])
+			return { previous }
+		},
+		onError: (_err, _newQuote, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(QUERY_KEY, context.previous)
+			}
 		},
 	})
 
@@ -31,8 +50,16 @@ export function useMutateQuotes() {
 			const next = await quotesService.updateQuote(quote)
 			return next
 		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(QUERY_KEY, () => data)
+		onMutate: async (updated: Quote) => {
+			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
+			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => old.map((q) => (q.id === updated.id ? updated : q)))
+			return { previous }
+		},
+		onError: (_err, _updated, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(QUERY_KEY, context.previous)
+			}
 		},
 	})
 
@@ -40,10 +67,36 @@ export function useMutateQuotes() {
 		mutationFn: async () => {
 			await quotesService.clearQuotesFromStorage()
 		},
-		onMutate: () => {
-			queryClient.setQueryData(QUERY_KEY, () => quotesService.DEFAULT_QUOTES)
+		onMutate: async () => {
+			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
+			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
+			queryClient.setQueryData(QUERY_KEY, () => [])
+			return { previous }
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(QUERY_KEY, context.previous)
+			}
 		},
 	})
 
-	return { addQuote, updateQuote, resetQuotes }
+	const deleteQuote = useMutation({
+		mutationFn: async (id: string) => {
+			const next = await quotesService.deleteQuoteById(id)
+			return next
+		},
+		onMutate: async (id: string) => {
+			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
+			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => old.filter((q) => q.id !== id))
+			return { previous }
+		},
+		onError: (_err, _id, context: any) => {
+			if (context?.previous) {
+				queryClient.setQueryData(QUERY_KEY, context.previous)
+			}
+		},
+	})
+
+	return { addQuote, updateQuote, resetQuotes, deleteQuote }
 }

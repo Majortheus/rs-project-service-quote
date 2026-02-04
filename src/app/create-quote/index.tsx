@@ -21,6 +21,8 @@ import { BackButton } from '@/components/page/back-button'
 import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
+import { useMutateQuotes } from '@/services/queries/quotes-query'
+import { type Quote, quotesService } from '@/services/quote'
 import { formatMoney } from '@/utils/formatMoney'
 
 const CREATE_QUOTE_SCHEMA = z.object({
@@ -51,9 +53,50 @@ export default function CreateQuoteScreen() {
 		resolver: zodResolver(CREATE_QUOTE_SCHEMA),
 	})
 
-	const onSubmit = useCallback((data: QuoteFormType) => {
-		console.log('Submitting quote:', data)
-	}, [])
+	const { addQuote, updateQuote } = useMutateQuotes()
+
+	const onSubmit = useCallback(
+		async (data: QuoteFormType) => {
+			try {
+				const now = new Date().toISOString()
+
+				if (!data.id) {
+					const newQuote: Quote = {
+						id: String(Date.now()),
+						client: data.client,
+						title: data.title,
+						items: data.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })),
+						discountPct: data.discountPct,
+						status: data.status,
+						createdAt: now,
+						updatedAt: now,
+					}
+
+					await addQuote.mutateAsync(newQuote)
+				} else {
+					const existing = await quotesService.getQuoteById(data.id)
+					const createdAt = existing?.createdAt ?? now
+					const updatedQuote: Quote = {
+						id: data.id,
+						client: data.client,
+						title: data.title,
+						items: data.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })),
+						discountPct: data.discountPct,
+						status: data.status,
+						createdAt,
+						updatedAt: now,
+					}
+
+					await updateQuote.mutateAsync(updatedQuote)
+				}
+
+				router.back()
+			} catch (error) {
+				console.error('Error saving quote:', error)
+			}
+		},
+		[addQuote, updateQuote, router],
+	)
 
 	return (
 		<Page>

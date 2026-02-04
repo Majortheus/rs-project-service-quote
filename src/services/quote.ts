@@ -10,7 +10,7 @@ export type Quote = {
 	items: {
 		id: string
 		title: string
-		description: string
+		description?: string
 		qty: number
 		price: number
 	}[]
@@ -19,45 +19,6 @@ export type Quote = {
 	createdAt: string
 	updatedAt: string
 }
-
-export const DEFAULT_QUOTES: Quote[] = [
-	{
-		id: '1',
-		client: 'Nome do cliente',
-		title: 'Título do serviço 1',
-		items: [
-			{
-				id: '1',
-				title: 'Serviço 1',
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-	{
-		id: '2',
-		client: 'Nome do cliente',
-		title: 'Título do serviço 2',
-		items: [
-			{
-				id: '1',
-				title: 'Serviço 1',
-				description: 'Descrição do item 1',
-				qty: 2,
-				price: 300.0,
-			},
-		],
-		discountPct: 200,
-		status: 'draft',
-		createdAt: '2026-01-25T12:27:00',
-		updatedAt: '2026-01-25T12:27:00',
-	},
-]
 
 async function saveQuotesToStorage(quotes: Quote[]) {
 	try {
@@ -75,7 +36,7 @@ async function getQuotesFromStorage(): Promise<Quote[]> {
 	} catch (error) {
 		console.error('Error retrieving quotes from storage:', error)
 	}
-	return DEFAULT_QUOTES
+	return []
 }
 
 async function clearQuotesFromStorage() {
@@ -105,12 +66,19 @@ async function getQuoteById(id: string) {
 	return quotes.find((q) => q.id === id)
 }
 
+async function deleteQuoteById(id: string) {
+	const quotes = await getQuotesFromStorage()
+	const next = quotes.filter((q) => q.id !== id)
+	await saveQuotesToStorage(next)
+	return next
+}
+
 export const quotesService = {
-	DEFAULT_QUOTES,
 	getQuotesFromStorage,
 	saveQuotesToStorage,
 	clearQuotesFromStorage,
 	addQuote,
 	updateQuote,
 	getQuoteById,
+	deleteQuoteById,
 }
