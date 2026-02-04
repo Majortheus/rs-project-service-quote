@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router'
 import { useCallback } from 'react'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import z from 'zod'
 import { CheckMageIcon } from '@/assets/icons/mage-icons/check-mage-icons'
 import { CreditCardMageIcon } from '@/assets/icons/mage-icons/credit-card-mage-icons'
@@ -31,9 +32,9 @@ const CREATE_QUOTE_SCHEMA = z.object({
 	discount: z.number().min(0).max(100),
 })
 
-export type CreateQuoteFormType = z.infer<typeof CREATE_QUOTE_SCHEMA>
+export type QuoteFormType = z.infer<typeof CREATE_QUOTE_SCHEMA>
 
-export const DEFAULT_CREATE_QUOTE_VALUES: CreateQuoteFormType = {
+export const DEFAULT_CREATE_QUOTE_VALUES: QuoteFormType = {
 	id: '',
 	title: '',
 	client: '',
@@ -45,12 +46,12 @@ export const DEFAULT_CREATE_QUOTE_VALUES: CreateQuoteFormType = {
 export default function CreateQuoteScreen() {
 	const router = useRouter()
 
-	const form = useForm<CreateQuoteFormType>({
+	const form = useForm<QuoteFormType>({
 		defaultValues: DEFAULT_CREATE_QUOTE_VALUES,
 		resolver: zodResolver(CREATE_QUOTE_SCHEMA),
 	})
 
-	const onSubmit = useCallback((data: CreateQuoteFormType) => {
+	const onSubmit = useCallback((data: QuoteFormType) => {
 		console.log('Submitting quote:', data)
 	}, [])
 
@@ -70,7 +71,9 @@ export default function CreateQuoteScreen() {
 						<QuoteService />
 						<Pricing />
 					</View>
-					<View className="sticky bottom-0 flex-1 flex-row justify-center gap-3 border-gray-200 border-t p-5 pb-20">
+				</KeyboardScroll>
+				<SafeAreaView edges={['bottom']} className="w-full">
+					<View className="w-full flex-row items-center justify-center gap-3 border-gray-200 border-t bg-white p-5 pb-10">
 						<Button
 							className="w-[95px]"
 							variant="outlined"
@@ -85,7 +88,7 @@ export default function CreateQuoteScreen() {
 							Salvar
 						</Button>
 					</View>
-				</KeyboardScroll>
+				</SafeAreaView>
 			</FormProvider>
 		</Page>
 	)
@@ -108,18 +111,18 @@ function StatusGroup() {
 			<View className="flex-row p-4">
 				<View className="w-full flex-1 grow gap-3">
 					<Radio name="status" value="draft">
-						<Status status="Rascunho" />
+						<Status status="draft" />
 					</Radio>
 					<Radio name="status" value="sent">
-						<Status status="Enviado" />
+						<Status status="sent" />
 					</Radio>
 				</View>
 				<View className="w-full flex-1 grow gap-3">
 					<Radio name="status" value="approved">
-						<Status status="Aprovado" />
+						<Status status="approved" />
 					</Radio>
 					<Radio name="status" value="rejected">
-						<Status status="Recusado" />
+						<Status status="rejected" />
 					</Radio>
 				</View>
 			</View>
@@ -128,7 +131,7 @@ function StatusGroup() {
 }
 
 function Pricing() {
-	const { watch } = useFormContext<CreateQuoteFormType>()
+	const { watch } = useFormContext<QuoteFormType>()
 	const services = watch('services') ?? []
 	const discount = watch('discount') ?? 0
 

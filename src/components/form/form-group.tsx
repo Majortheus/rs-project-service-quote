@@ -15,7 +15,7 @@ export function FormGroup({ title, icon: Icon, children }: FormGroupProps) {
 	return (
 		<View className="rounded-lg border border-gray-300">
 			<View className="w-full flex-row items-center gap-2 border-gray-300 border-b px-4 py-3">
-				{Icon && <Icon className="h-5 w-5 text-purple-base" width={20} height={20} />}
+				{Icon && <Icon className="max-h-4 max-w-4 text-purple-base" width={16} height={16} />}
 				<Typography variant="text-xs" className="text-gray-500">
 					{title}
 				</Typography>

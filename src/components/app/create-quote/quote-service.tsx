@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { View } from 'react-native'
-import type { CreateQuoteFormType } from '@/app/create-quote'
+import type { QuoteFormType } from '@/app/create-quote'
 import { EditPenMageIcon } from '@/assets/icons/mage-icons/edit-pen-mage-icons'
 import { NoteWithTextMageIcon } from '@/assets/icons/mage-icons/note-with-text-mage-icons'
 import { PlusMageIcon } from '@/assets/icons/mage-icons/plus-mage-icons'
@@ -15,7 +15,7 @@ import { AddServiceDrawer } from './add-service-drawer'
 export function QuoteService() {
 	const { openBottomSheet } = useBottomSheet()
 
-	const { control, getFieldState } = useFormContext<CreateQuoteFormType>()
+	const { control, getFieldState } = useFormContext<QuoteFormType>()
 	const { error } = getFieldState('services')
 	const servicesArray = useFieldArray({ name: 'services', control: control })
 

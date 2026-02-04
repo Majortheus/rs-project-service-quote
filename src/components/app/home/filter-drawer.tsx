@@ -91,16 +91,16 @@ function StatusFilter() {
 			</Typography>
 			<View className="gap-3">
 				<Checkbox name="status" value="draft">
-					<Status status="Rascunho" />
+					<Status status="draft" />
 				</Checkbox>
 				<Checkbox name="status" value="sent">
-					<Status status="Enviado" />
+					<Status status="sent" />
 				</Checkbox>
 				<Checkbox name="status" value="approved">
-					<Status status="Aprovado" />
+					<Status status="approved" />
 				</Checkbox>
 				<Checkbox name="status" value="rejected">
-					<Status status="Recusado" />
+					<Status status="rejected" />
 				</Checkbox>
 			</View>
 		</View>

@@ -1,7 +1,6 @@
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { useRouter } from 'expo-router'
 import { FormProvider, useForm } from 'react-hook-form'
-import { FlatList, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { FlatList, TouchableOpacity, View } from 'react-native'
 import { FilterMageIcon } from '@/assets/icons/mage-icons/filter-mage-icons'
 import { SearchMageIcon } from '@/assets/icons/mage-icons/search-mage-icons'
 import { FilterDrawer } from '@/components/app/home/filter-drawer'
@@ -42,7 +41,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -58,7 +57,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -74,7 +73,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -90,7 +89,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -106,7 +105,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -122,7 +121,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -138,7 +137,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -154,7 +153,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -170,7 +169,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -186,7 +185,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -202,7 +201,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -218,7 +217,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -234,7 +233,7 @@ const data: Quote[] = [
 			},
 		],
 		discountPct: 200,
-		status: 'Rascunho',
+		status: 'draft',
 		createdAt: '2026-01-25T12:27:00',
 		updatedAt: '2026-01-25T12:27:00',
 	},
@@ -276,8 +275,13 @@ type RenderQuoteProps = {
 }
 
 function QuoteItem({ quote }: RenderQuoteProps) {
+	const router = useRouter()
 	return (
-		<View className="relative min-h-[82px] w-full flex-row justify-between gap-3 rounded-[10px] border border-gray-200 bg-gray-100 p-4">
+		<TouchableOpacity
+			activeOpacity={0.7}
+			onPress={() => router.push({ pathname: '/quote-details', params: { id: quote.id } })}
+			className="relative min-h-[82px] w-full flex-row justify-between gap-3 rounded-[10px] border border-gray-200 bg-gray-100 p-4"
+		>
 			<View className="flex-1 justify-between">
 				<Typography variant="title-md">{quote.title}</Typography>
 				<Typography variant="text-sm" className="text-gray-600">
@@ -293,6 +297,6 @@ function QuoteItem({ quote }: RenderQuoteProps) {
 					<Typography variant="title-md">{formatMoney(quote.items.reduce((sum, item) => sum + item.price * item.qty, 0) - quote.discountPct)}</Typography>
 				</View>
 			</View>
-		</View>
+		</TouchableOpacity>
 	)
 }

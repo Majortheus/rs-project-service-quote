@@ -32,7 +32,7 @@ export function Button({ children, startIcon: StartIcon, variant = 'filled', col
 			)}
 			{...props}
 		>
-			{StartIcon && <StartIcon className={twMerge(clsx({ 'mr-1': StartIcon && children }), textColor)} />}
+			{StartIcon && <StartIcon className={twMerge(clsx({ 'mr-2': StartIcon && children }), textColor)} />}
 			<Typography variant="title-sm" className={textColor}>
 				{children}
 			</Typography>
