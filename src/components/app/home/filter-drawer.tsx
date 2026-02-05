@@ -47,7 +47,8 @@ export function FilterDrawer() {
 	const onReset = useCallback(() => {
 		form.reset(filtersService.DEFAULT_FILTER_VALUES)
 		resetFilters.mutate()
-	}, [form, resetFilters])
+		closeBottomSheet()
+	}, [form, resetFilters, closeBottomSheet])
 
 	return (
 		<FormProvider {...form}>

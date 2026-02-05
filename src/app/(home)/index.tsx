@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { FlatList, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native'
 import { FilterMageIcon } from '@/assets/icons/mage-icons/filter-mage-icons'
 import { SearchMageIcon } from '@/assets/icons/mage-icons/search-mage-icons'
 import { FilterDrawer } from '@/components/app/home/filter-drawer'
@@ -11,6 +12,7 @@ import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
 import { useBottomSheet } from '@/hooks/useBottomSheets'
+import { useGetFilters } from '@/services/queries/filters-query'
 import { useGetQuotes } from '@/services/queries/quotes-query'
 import type { Quote } from '@/services/quote'
 import { formatMoney } from '@/utils/formatMoney'
@@ -20,7 +22,8 @@ export default function HomeScreen() {
 
 	const form = useForm()
 
-	const { data: quotes = [] } = useGetQuotes()
+	const { data: filters } = useGetFilters()
+	const { data: quotes = [], isLoading } = useGetQuotes(filters)
 
 	return (
 		<Page>
@@ -31,16 +34,26 @@ export default function HomeScreen() {
 						<View className="flex-1">
 							<Input name="search" startIcon={SearchMageIcon} placeholder="Título ou cliente" />
 						</View>
-						<Button startIcon={FilterMageIcon} variant="outlined" onPress={() => openBottomSheet(<FilterDrawer />)} />
+						<Button
+							startIcon={FilterMageIcon}
+							variant={filters?.sort !== 'recent' || (filters?.status && filters?.status.length > 0) ? 'filled' : 'outlined'}
+							onPress={() => openBottomSheet(<FilterDrawer />)}
+						/>
 					</View>
 					<View className="flex-1">
-						<FlatList
-							data={quotes}
-							keyExtractor={(item) => item.id.toString()}
-							renderItem={({ item }) => <QuoteItem quote={item} />}
-							showsVerticalScrollIndicator={false}
-							contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
-						/>
+						{isLoading ? (
+							<View className="flex-1 items-center justify-center">
+								<ActivityIndicator size="large" />
+							</View>
+						) : (
+							<FlatList
+								data={quotes}
+								keyExtractor={(item) => item.id.toString()}
+								renderItem={({ item }) => <QuoteItem quote={item} />}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
+							/>
+						)}
 					</View>
 				</View>
 			</FormProvider>
@@ -54,6 +67,12 @@ type RenderQuoteProps = {
 
 function QuoteItem({ quote }: RenderQuoteProps) {
 	const router = useRouter()
+	const total = useMemo(() => {
+		const subtotal = quote.items.reduce((sum, item) => sum + item.price * item.qty, 0)
+		const discountAmount = Math.round(((subtotal * quote.discountPct) / 100) * 100) / 100
+		return Math.round(Math.max(0, subtotal - discountAmount) * 100) / 100
+	}, [quote])
+
 	return (
 		<TouchableOpacity
 			activeOpacity={0.7}
@@ -72,7 +91,7 @@ function QuoteItem({ quote }: RenderQuoteProps) {
 				</View>
 				<View className="flex-row items-baseline gap-1">
 					<Typography variant="text-xs">R$</Typography>
-					<Typography variant="title-md">{formatMoney(quote.items.reduce((sum, item) => sum + item.price * item.qty, 0) - quote.discountPct)}</Typography>
+					<Typography variant="title-md">{formatMoney(total)}</Typography>
 				</View>
 			</View>
 		</TouchableOpacity>

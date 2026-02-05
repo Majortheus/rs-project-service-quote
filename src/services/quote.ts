@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import type { FilterFormType } from '@/components/app/home/filter-drawer'
 import type { StatusType } from '@/components/status'
 
 const ASYNC_STORAGE_KEY = '@SERVICE-QUOTE:quotes'
@@ -39,6 +40,39 @@ async function getQuotesFromStorage(): Promise<Quote[]> {
 	return []
 }
 
+// Apply business rules for filtering/sorting when filters are provided
+async function getQuotes(filters?: FilterFormType): Promise<Quote[]> {
+	const quotes = await getQuotesFromStorage()
+
+	if (!filters) return quotes
+
+	let result = [...quotes]
+
+	// Filter by status (if provided and non-empty)
+	if (filters.status && filters.status.length > 0) {
+		result = result.filter((q) => filters.status?.includes(q.status))
+	}
+
+	// Sorting
+	const sort = filters.sort ?? 'recent'
+
+	function totalValue(q: Quote) {
+		return q.items.reduce((sum, item) => sum + item.price * item.qty, 0) - q.discountPct
+	}
+
+	if (sort === 'recent') {
+		result.sort((a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt)))
+	} else if (sort === 'oldest') {
+		result.sort((a, b) => Number(new Date(a.createdAt)) - Number(new Date(b.createdAt)))
+	} else if (sort === 'highest') {
+		result.sort((a, b) => totalValue(b) - totalValue(a))
+	} else if (sort === 'lowest') {
+		result.sort((a, b) => totalValue(a) - totalValue(b))
+	}
+
+	return result
+}
+
 async function clearQuotesFromStorage() {
 	try {
 		await AsyncStorage.removeItem(ASYNC_STORAGE_KEY)
@@ -75,6 +109,7 @@ async function deleteQuoteById(id: string) {
 
 export const quotesService = {
 	getQuotesFromStorage,
+	getQuotes,
 	saveQuotesToStorage,
 	clearQuotesFromStorage,
 	addQuote,

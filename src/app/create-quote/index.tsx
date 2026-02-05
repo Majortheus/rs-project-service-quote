@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'expo-router'
-import { useCallback } from 'react'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useCallback, useEffect } from 'react'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -11,6 +11,8 @@ import { ShopMageIcon } from '@/assets/icons/mage-icons/shop-mage-icons'
 import { TagMageIcon } from '@/assets/icons/mage-icons/tag-mage-icons'
 import { SERVICE_SCHEMA } from '@/components/app/create-quote/add-service-drawer'
 import { QuoteService } from '@/components/app/create-quote/quote-service'
+import { QuoteDetailsLoading } from '@/components/app/quote-details/loading'
+import { QuoteDetailsNotFound } from '@/components/app/quote-details/not-found'
 import { Button } from '@/components/button'
 import { FormGroup } from '@/components/form/form-group'
 import { Input } from '@/components/form/inputs/input'
@@ -21,7 +23,7 @@ import { BackButton } from '@/components/page/back-button'
 import { Page } from '@/components/page/page'
 import { Status } from '@/components/status'
 import { Typography } from '@/components/typography'
-import { useMutateQuotes } from '@/services/queries/quotes-query'
+import { useGetQuote, useMutateQuotes } from '@/services/queries/quotes-query'
 import { type Quote, quotesService } from '@/services/quote'
 import { formatMoney } from '@/utils/formatMoney'
 
@@ -48,10 +50,27 @@ export const DEFAULT_CREATE_QUOTE_VALUES: QuoteFormType = {
 export default function CreateQuoteScreen() {
 	const router = useRouter()
 
+	const { id } = useLocalSearchParams<{ id?: string }>()
+
+	const { data: existingQuote, isLoading: isQuoteLoading } = useGetQuote(id)
+
 	const form = useForm<QuoteFormType>({
 		defaultValues: DEFAULT_CREATE_QUOTE_VALUES,
 		resolver: zodResolver(CREATE_QUOTE_SCHEMA),
 	})
+
+	useEffect(() => {
+		if (existingQuote) {
+			form.reset({
+				id: existingQuote.id,
+				title: existingQuote.title,
+				client: existingQuote.client,
+				status: existingQuote.status,
+				items: existingQuote.items.map((it) => ({ ...it })),
+				discountPct: existingQuote.discountPct,
+			})
+		}
+	}, [existingQuote, form])
 
 	const { addQuote, updateQuote } = useMutateQuotes()
 
@@ -98,13 +117,16 @@ export default function CreateQuoteScreen() {
 		[addQuote, updateQuote, router],
 	)
 
+	if (id && isQuoteLoading) return <QuoteDetailsLoading />
+	if (id && !isQuoteLoading && !existingQuote) return <QuoteDetailsNotFound />
+
 	return (
 		<Page>
 			<FormProvider {...form}>
 				<View className="w-full flex-row items-center justify-start gap-5 border-gray-200 border-b p-5">
 					<BackButton />
 					<Typography variant="title-sm" className="flex-1">
-						Novo Orçamento
+						{existingQuote ? 'Editar Orçamento' : 'Novo Orçamento'}
 					</Typography>
 				</View>
 				<KeyboardScroll>

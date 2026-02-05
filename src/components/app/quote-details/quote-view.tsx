@@ -194,7 +194,7 @@ export function QuoteDetailsView({ quote }: Props) {
 								}
 							}}
 						/>
-						<Button variant="outlined" startIcon={EditPenMageIcon} />
+						<Button variant="outlined" startIcon={EditPenMageIcon} onPress={() => router.push({ pathname: '/create-quote', params: { id: quote.id } })} />
 					</View>
 
 					<Button startIcon={DirectionUpRightMageIcon} className="w-[146px]">

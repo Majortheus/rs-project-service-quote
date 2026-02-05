@@ -1,21 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { FilterFormType } from '@/components/app/home/filter-drawer'
 import type { Quote } from '@/services/quote'
 import { quotesService } from '@/services/quote'
 
-const QUERY_KEY = ['quotes']
+const QUERY_KEY_QUOTES = ['quotes']
+const QUERY_KEY_QUOTE = ['quote']
 
-export function useGetQuotes() {
+const NO_FILTER_KEY = [...QUERY_KEY_QUOTES, undefined]
+
+export function useGetQuotes(filters?: FilterFormType) {
 	return useQuery({
-		queryKey: QUERY_KEY,
+		queryKey: [...QUERY_KEY_QUOTES, filters],
 		queryFn: async () => {
-			return quotesService.getQuotesFromStorage()
+			return quotesService.getQuotes(filters)
 		},
 	})
 }
 
 export function useGetQuote(id?: string) {
 	return useQuery({
-		queryKey: [...QUERY_KEY, id],
+		queryKey: [...QUERY_KEY_QUOTE, id],
 		queryFn: async () => {
 			if (!id) return null
 			return quotesService.getQuoteById(String(id))
@@ -33,15 +37,24 @@ export function useMutateQuotes() {
 			return next
 		},
 		onMutate: async (newQuote: Quote) => {
-			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
-			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
-			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => [...old, newQuote])
-			return { previous }
+			const previousList = queryClient.getQueryData<Quote[]>(NO_FILTER_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(NO_FILTER_KEY, (old = []) => [...old, newQuote])
+
+			const previousSingle = queryClient.getQueryData<Quote | null>([...QUERY_KEY_QUOTE, newQuote.id]) ?? null
+			queryClient.setQueryData([...QUERY_KEY_QUOTE, newQuote.id], newQuote)
+
+			return { previousList, previousSingle }
 		},
 		onError: (_err, _newQuote, context) => {
-			if (context?.previous) {
-				queryClient.setQueryData(QUERY_KEY, context.previous)
+			if (context?.previousList) {
+				queryClient.setQueryData(NO_FILTER_KEY, context.previousList)
 			}
+			if (context?.previousSingle) {
+				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
 		},
 	})
 
@@ -51,32 +64,24 @@ export function useMutateQuotes() {
 			return next
 		},
 		onMutate: async (updated: Quote) => {
-			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
-			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
-			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => old.map((q) => (q.id === updated.id ? updated : q)))
-			return { previous }
+			const previousList = queryClient.getQueryData<Quote[]>(NO_FILTER_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(NO_FILTER_KEY, (old = []) => old.map((q) => (q.id === updated.id ? updated : q)))
+
+			const previousSingle = queryClient.getQueryData<Quote | null>([...QUERY_KEY_QUOTE, updated.id]) ?? null
+			queryClient.setQueryData([...QUERY_KEY_QUOTE, updated.id], updated)
+
+			return { previousList, previousSingle }
 		},
 		onError: (_err, _updated, context) => {
-			if (context?.previous) {
-				queryClient.setQueryData(QUERY_KEY, context.previous)
+			if (context?.previousList) {
+				queryClient.setQueryData(NO_FILTER_KEY, context.previousList)
+			}
+			if (context?.previousSingle) {
+				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
 			}
 		},
-	})
-
-	const resetQuotes = useMutation({
-		mutationFn: async () => {
-			await quotesService.clearQuotesFromStorage()
-		},
-		onMutate: async () => {
-			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
-			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
-			queryClient.setQueryData(QUERY_KEY, () => [])
-			return { previous }
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				queryClient.setQueryData(QUERY_KEY, context.previous)
-			}
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
 		},
 	})
 
@@ -86,17 +91,26 @@ export function useMutateQuotes() {
 			return next
 		},
 		onMutate: async (id: string) => {
-			await queryClient.cancelQueries({ queryKey: QUERY_KEY })
-			const previous = queryClient.getQueryData<Quote[]>(QUERY_KEY) ?? []
-			queryClient.setQueryData<Quote[]>(QUERY_KEY, (old = []) => old.filter((q) => q.id !== id))
-			return { previous }
+			const previousList = queryClient.getQueryData<Quote[]>(NO_FILTER_KEY) ?? []
+			queryClient.setQueryData<Quote[]>(NO_FILTER_KEY, (old = []) => old.filter((q) => q.id !== id))
+
+			const previousSingle = queryClient.getQueryData<Quote | null>([...QUERY_KEY_QUOTE, id]) ?? null
+			queryClient.removeQueries({ queryKey: [...QUERY_KEY_QUOTE, id] })
+
+			return { previousList, previousSingle }
 		},
-		onError: (_err, _id, context: any) => {
-			if (context?.previous) {
-				queryClient.setQueryData(QUERY_KEY, context.previous)
+		onError: (_err, _id, context) => {
+			if (context?.previousList) {
+				queryClient.setQueryData(NO_FILTER_KEY, context.previousList)
 			}
+			if (context?.previousSingle) {
+				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
 		},
 	})
 
-	return { addQuote, updateQuote, resetQuotes, deleteQuote }
+	return { addQuote, updateQuote, deleteQuote }
 }

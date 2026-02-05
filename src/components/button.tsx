@@ -21,10 +21,10 @@ export function Button({ children, startIcon: StartIcon, variant = 'filled', col
 		<TouchableOpacity
 			activeOpacity={0.6}
 			className={twMerge(
-				'h-[48px] flex-row items-center justify-center rounded-full p-3',
+				'min-h-[48px] flex-row items-center justify-center rounded-full p-3',
 				clsx({
-					'bg-purple-base': variant === 'filled' && color === 'primary',
-					'bg-danger-base': variant === 'filled' && color === 'danger',
+					'border border-purple-base bg-purple-base': variant === 'filled' && color === 'primary',
+					'border border-danger-base bg-danger-base': variant === 'filled' && color === 'danger',
 					'border border-gray-300 bg-gray-100': variant === 'outlined',
 					'p-1': variant === 'ghost',
 				}),
