@@ -41,23 +41,29 @@ async function getQuotesFromStorage(): Promise<Quote[]> {
 }
 
 // Apply business rules for filtering/sorting when filters are provided
-async function getQuotes(filters?: FilterFormType): Promise<Quote[]> {
+async function getQuotes(filters?: FilterFormType, search?: string): Promise<Quote[]> {
 	const quotes = await getQuotesFromStorage()
-
-	if (!filters) return quotes
 
 	let result = [...quotes]
 
 	// Filter by status (if provided and non-empty)
-	if (filters.status && filters.status.length > 0) {
+	if (filters && filters.status && filters.status.length > 0) {
 		result = result.filter((q) => filters.status?.includes(q.status))
 	}
 
+	// Filter by search (title or client)
+	if (search && search.trim().length > 0) {
+		const s = search.trim().toLowerCase()
+		result = result.filter((q) => q.title.toLowerCase().includes(s) || q.client.toLowerCase().includes(s))
+	}
+
 	// Sorting
-	const sort = filters.sort ?? 'recent'
+	const sort = filters?.sort ?? 'recent'
 
 	function totalValue(q: Quote) {
-		return q.items.reduce((sum, item) => sum + item.price * item.qty, 0) - q.discountPct
+		const subtotal = q.items.reduce((sum, item) => sum + item.price * item.qty, 0)
+		const discountAmount = Math.round(((subtotal * q.discountPct) / 100) * 100) / 100
+		return Math.round((subtotal - discountAmount) * 100) / 100
 	}
 
 	if (sort === 'recent') {

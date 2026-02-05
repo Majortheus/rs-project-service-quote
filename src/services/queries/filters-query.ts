@@ -1,3 +1,4 @@
+import { toast } from '@backpackapp-io/react-native-toast'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { FilterFormType } from '@/components/app/home/filter-drawer'
 import { filtersService } from '../filter'
@@ -8,7 +9,12 @@ export function useGetFilters() {
 	return useQuery({
 		queryKey: QUERY_KEY,
 		queryFn: async () => {
-			return filtersService.getFiltersFromStorage()
+			try {
+				return await filtersService.getFiltersFromStorage()
+			} catch (error) {
+				toast.error('Erro ao carregar filtros')
+				throw error
+			}
 		},
 	})
 }

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native'
 import { FilterMageIcon } from '@/assets/icons/mage-icons/filter-mage-icons'
@@ -23,7 +23,19 @@ export default function HomeScreen() {
 	const form = useForm()
 
 	const { data: filters } = useGetFilters()
-	const { data: quotes = [], isLoading } = useGetQuotes(filters)
+
+	const [debouncedSearch, setDebouncedSearch] = useState<string | undefined>(undefined)
+
+	const searchValue = form.watch('search') ?? ''
+
+	useEffect(() => {
+		const t = setTimeout(() => {
+			setDebouncedSearch(searchValue?.toString().trim() ?? undefined)
+		}, 400)
+		return () => clearTimeout(t)
+	}, [searchValue])
+
+	const { data: quotes = [], isLoading } = useGetQuotes(filters, debouncedSearch)
 
 	return (
 		<Page>

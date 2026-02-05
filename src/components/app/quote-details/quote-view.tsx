@@ -1,7 +1,8 @@
+import { toast } from '@backpackapp-io/react-native-toast'
 import { clsx } from 'clsx'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { FlatList, View } from 'react-native'
+import { FlatList, Share, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { twMerge } from 'tailwind-merge'
 import { CopyMageIcon } from '@/assets/icons/mage-icons/copy-mage-icons'
@@ -197,7 +198,24 @@ export function QuoteDetailsView({ quote }: Props) {
 						<Button variant="outlined" startIcon={EditPenMageIcon} onPress={() => router.push({ pathname: '/create-quote', params: { id: quote.id } })} />
 					</View>
 
-					<Button startIcon={DirectionUpRightMageIcon} className="w-[146px]">
+					<Button
+						startIcon={DirectionUpRightMageIcon}
+						className="w-[146px]"
+						onPress={async () => {
+							try {
+								const itemsText = quote.items.map((it) => `${it.qty}x ${it.title} - R$ ${formatMoney(it.price)}`).join('\n')
+
+								const discountText = quote.discountPct > 0 ? `Desconto: ${quote.discountPct}% (- R$ ${formatMoney(discountAmount)})\n\n` : ''
+
+								const message = `Orçamento #${quote.id}\n${quote.title}\nCliente: ${quote.client}\n\nItens:\n${itemsText}\n\n${discountText}Total: R$ ${formatMoney(total)}`
+
+								await Share.share({ message })
+							} catch (error) {
+								toast.error('Erro ao compartilhar orçamento')
+								console.error('Error sharing quote:', error)
+							}
+						}}
+					>
 						Compartilhar
 					</Button>
 				</View>

@@ -1,4 +1,6 @@
+import { toast } from '@backpackapp-io/react-native-toast'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CheckMageIcon } from '@/assets/icons/mage-icons/check-mage-icons'
 import type { FilterFormType } from '@/components/app/home/filter-drawer'
 import type { Quote } from '@/services/quote'
 import { quotesService } from '@/services/quote'
@@ -8,11 +10,16 @@ const QUERY_KEY_QUOTE = ['quote']
 
 const NO_FILTER_KEY = [...QUERY_KEY_QUOTES, undefined]
 
-export function useGetQuotes(filters?: FilterFormType) {
+export function useGetQuotes(filters?: FilterFormType, search?: string) {
 	return useQuery({
-		queryKey: [...QUERY_KEY_QUOTES, filters],
+		queryKey: [...QUERY_KEY_QUOTES, filters, search],
 		queryFn: async () => {
-			return quotesService.getQuotes(filters)
+			try {
+				return quotesService.getQuotes(filters, search)
+			} catch (error) {
+				toast.error('Erro ao carregar orçamentos')
+				throw error
+			}
 		},
 	})
 }
@@ -52,9 +59,11 @@ export function useMutateQuotes() {
 			if (context?.previousSingle) {
 				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
 			}
+			toast.error('Erro ao criar orçamento')
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
+			toast.success('Orçamento criado com sucesso')
 		},
 	})
 
@@ -79,9 +88,13 @@ export function useMutateQuotes() {
 			if (context?.previousSingle) {
 				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
 			}
+			toast.error('Erro ao atualizar orçamento')
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
+			toast.success('Orçamento atualizado com sucesso', {
+				icon: CheckMageIcon,
+			})
 		},
 	})
 
@@ -106,9 +119,11 @@ export function useMutateQuotes() {
 			if (context?.previousSingle) {
 				queryClient.setQueryData([...QUERY_KEY_QUOTE, context.previousSingle.id], context.previousSingle)
 			}
+			toast.error('Erro ao excluir orçamento')
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY_QUOTES })
+			toast.success('Orçamento excluído com sucesso')
 		},
 	})
 
